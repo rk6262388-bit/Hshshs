@@ -4,197 +4,219 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 
--- // Elite Configuration
+-- // Configuration
 local LOADING_TIME = 20
 local YT_LINK = "https://www.youtube.com/@AizenScript2"
-local PRIMARY = Color3.fromRGB(0, 255, 180) -- Zenith Mint
-local SECONDARY = Color3.fromRGB(10, 10, 12)
-local ACCENT_GLOW = Color3.fromRGB(0, 150, 100)
+local ACCENT = Color3.fromRGB(0, 255, 180) -- Cyber Mint
+local DARK_BG = Color3.fromRGB(5, 5, 8)
+local PANEL_COLOR = Color3.fromRGB(12, 12, 15)
 
 -- // UI Root
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "Aizen_Zenith"
+ScreenGui.Name = "Aizen_Zenith_II"
 ScreenGui.IgnoreGuiInset = true
 ScreenGui.DisplayOrder = 9999
 ScreenGui.Parent = game:GetService("CoreGui") or LocalPlayer:WaitForChild("PlayerGui")
 
--- // 1. Dark Void Overlay
+-- // 1. The Void (Blackout)
 local Void = Instance.new("Frame")
 Void.Size = UDim2.new(1, 0, 1, 0)
-Void.BackgroundColor3 = Color3.fromRGB(2, 2, 3)
+Void.BackgroundColor3 = DARK_BG
 Void.BorderSizePixel = 0
 Void.ZIndex = 1
 Void.Parent = ScreenGui
 
--- // 2. Particle Starfield (Procedural)
-local function CreateParticle()
-    local p = Instance.new("Frame")
-    p.Size = UDim2.new(0, 2, 0, 2)
-    p.Position = UDim2.new(math.random(), 0, math.random(), 0)
-    p.BackgroundColor3 = PRIMARY
-    p.BackgroundTransparency = 0.8
-    p.BorderSizePixel = 0
-    p.ZIndex = 2
-    p.Parent = Void
-    task.spawn(function()
-        while p.Parent do
-            TweenService:Create(p, TweenInfo.new(math.random(2,5)), {BackgroundTransparency = 1}):Play()
-            task.wait(math.random(2,5))
-            TweenService:Create(p, TweenInfo.new(math.random(2,5)), {BackgroundTransparency = 0.5}):Play()
-            task.wait(math.random(2,5))
-        end
-    end)
-end
-for i = 1, 50 do CreateParticle() end
+-- // 2. Loading Hub
+local Hub = Instance.new("Frame")
+Hub.Size = UDim2.new(1, 0, 1, 0)
+Hub.BackgroundTransparency = 1
+Hub.ZIndex = 10
+Hub.Parent = ScreenGui
 
--- // 3. The Loading Core
-local Core = Instance.new("Frame")
-Core.Size = UDim2.new(1, 0, 1, 0)
-Core.BackgroundTransparency = 1
-Core.ZIndex = 10
-Core.Parent = ScreenGui
+local Avatar = Instance.new("ImageLabel")
+Avatar.Size = UDim2.new(0, 110, 0, 110)
+Avatar.Position = UDim2.new(0.5, 0, 0.4, -20)
+Avatar.AnchorPoint = Vector2.new(0.5, 0.5)
+Avatar.Image = Players:GetUserThumbnailAsync(LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+Avatar.BackgroundTransparency = 1
+Avatar.ImageTransparency = 1
+Avatar.Parent = Hub
+Instance.new("UICorner", Avatar).CornerRadius = UDim.new(1, 0)
 
-local Profile = Instance.new("ImageLabel")
-Profile.Size = UDim2.new(0, 130, 0, 130)
-Profile.Position = UDim2.new(0.5, 0, 0.42, 0)
-Profile.AnchorPoint = Vector2.new(0.5, 0.5)
-Profile.Image = Players:GetUserThumbnailAsync(LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
-Profile.BackgroundTransparency = 1
-Profile.Parent = Core
-Instance.new("UICorner", Profile).CornerRadius = UDim.new(1, 0)
-local ProfileStroke = Instance.new("UIStroke", Profile)
-ProfileStroke.Color = PRIMARY
-ProfileStroke.Thickness = 0
-ProfileStroke.Transparency = 0.5
+local UserTitle = Instance.new("TextLabel")
+UserTitle.Size = UDim2.new(0, 400, 0, 30)
+UserTitle.Position = UDim2.new(0.5, 0, 0.48, 10)
+UserTitle.AnchorPoint = Vector2.new(0.5, 0.5)
+UserTitle.BackgroundTransparency = 1
+UserTitle.Font = Enum.Font.GothamMedium
+UserTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+UserTitle.TextSize = 20
+UserTitle.Text = "Verified: " .. LocalPlayer.Name
+UserTitle.TextTransparency = 1
+UserTitle.Parent = Hub
 
-local Percent = Instance.new("TextLabel")
-Percent.Size = UDim2.new(0, 200, 0, 60)
-Percent.Position = UDim2.new(0.5, 0, 0.55, 0)
-Percent.AnchorPoint = Vector2.new(0.5, 0.5)
-Percent.BackgroundTransparency = 1
-Percent.Font = Enum.Font.GothamBold
-Percent.TextColor3 = Color3.fromRGB(255, 255, 255)
-Percent.TextSize = 50
-Percent.Text = "0%"
-Percent.Parent = Core
+local Counter = Instance.new("TextLabel")
+Counter.Size = UDim2.new(0, 200, 0, 60)
+Counter.Position = UDim2.new(0.5, 0, 0.55, 0)
+Counter.AnchorPoint = Vector2.new(0.5, 0.5)
+Counter.BackgroundTransparency = 1
+Counter.Font = Enum.Font.GothamBold
+Counter.TextColor3 = ACCENT
+Counter.TextSize = 55
+Counter.Text = "0%"
+Counter.TextTransparency = 1
+Counter.Parent = Hub
 
--- // 4. Main Zenith Dashboard
+local YT = Instance.new("TextButton")
+YT.Size = UDim2.new(0, 300, 0, 30)
+YT.Position = UDim2.new(0.5, 0, 0.9, 0)
+YT.AnchorPoint = Vector2.new(0.5, 0.5)
+YT.BackgroundTransparency = 1
+YT.Font = Enum.Font.Gotham
+YT.TextColor3 = ACCENT
+YT.TextSize = 14
+YT.Text = "YouTube: AizenScript2"
+YT.TextTransparency = 1
+YT.Parent = Hub
+
+-- // 3. Main Dashboard
 local Main = Instance.new("Frame")
 Main.Size = UDim2.new(0, 330, 0, 420)
-Main.Position = UDim2.new(0.5, 0, 1.5, 0)
+Main.Position = UDim2.new(0.5, 0, 1.5, 0) -- Off-screen bottom
 Main.AnchorPoint = Vector2.new(0.5, 0.5)
-Main.BackgroundColor3 = SECONDARY
+Main.BackgroundColor3 = PANEL_COLOR
 Main.BorderSizePixel = 0
-Main.ClipsDescendants = true
 Main.Visible = false
 Main.ZIndex = 100
 Main.Parent = ScreenGui
 
 local MCorner = Instance.new("UICorner", Main)
-MCorner.CornerRadius = UDim.new(0, 20)
+MCorner.CornerRadius = UDim.new(0, 18)
 local MStroke = Instance.new("UIStroke", Main)
-MStroke.Color = PRIMARY
+MStroke.Color = ACCENT
 MStroke.Thickness = 1.5
-MStroke.Transparency = 0.4
+MStroke.Transparency = 0.5
+
+local Header = Instance.new("TextLabel")
+Header.Size = UDim2.new(1, 0, 0, 60)
+Header.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+Header.Text = "AIZEN ZENITH II"
+Header.Font = Enum.Font.GothamBold
+Header.TextColor3 = ACCENT
+Header.TextSize = 18
+Header.Parent = Main
+Instance.new("UICorner", Header).CornerRadius = UDim.new(0, 18)
 
 -- // Execution Logic
 task.spawn(function()
-    local start = tick()
-    while tick() - start < LOADING_TIME do
-        local elapsed = tick() - start
-        local progress = elapsed / LOADING_TIME
+    -- Fade In UI
+    local info = TweenInfo.new(1.2, Enum.EasingStyle.QuartOut)
+    TweenService:Create(Avatar, info, {ImageTransparency = 0}):Play()
+    TweenService:Create(UserTitle, info, {TextTransparency = 0}):Play()
+    TweenService:Create(Counter, info, {TextTransparency = 0}):Play()
+    TweenService:Create(YT, info, {TextTransparency = 0.4}):Play()
+
+    -- Accurate Progress Loop
+    local startTick = tick()
+    while tick() - startTick < LOADING_TIME do
+        local elapsed = tick() - startTick
+        local progress = math.min(elapsed / LOADING_TIME, 1)
+        Counter.Text = math.floor(progress * 100) .. "%"
         
-        -- Smooth Interpolation
-        Percent.Text = math.floor(progress * 100) .. "%"
-        ProfileStroke.Thickness = 3 * math.sin(tick() * 4) + 4
-        
-        -- Floating motion
-        Profile.Position = UDim2.new(0.5, 0, 0.42, math.sin(tick() * 2) * 10)
-        
-        RunService.RenderStepped:Wait()
+        -- Add a subtle shake to Avatar as it nears 100%
+        Avatar.Rotation = math.sin(tick() * 10) * (progress * 5)
+        RunService.Heartbeat:Wait()
     end
     
-    Percent.Text = "100%"
-    task.wait(0.5)
+    Counter.Text = "READY"
+    task.wait(1)
     
-    -- Dissolve Animation
-    TweenService:Create(Core, TweenInfo.new(1, Enum.EasingStyle.QuartIn), {Position = UDim2.new(0, 0, -1, 0)}):Play()
-    TweenService:Create(Void, TweenInfo.new(1.5), {BackgroundTransparency = 1}):Play()
+    -- Dissolve Loading
+    TweenService:Create(Hub, TweenInfo.new(0.8, Enum.EasingStyle.BackIn), {Position = UDim2.new(0, 0, -1, 0)}):Play()
+    TweenService:Create(Void, TweenInfo.new(1.2), {BackgroundTransparency = 1}):Play()
     
-    task.wait(0.8)
+    task.wait(0.6)
+    
+    -- Show Dashboard
     Main.Visible = true
-    TweenService:Create(Main, TweenInfo.new(1.2, Enum.EasingStyle.BackOut), {Position = UDim2.new(0.5, 0, 0.5, 0)}):Play()
+    TweenService:Create(Main, TweenInfo.new(1, Enum.EasingStyle.BackOut), {Position = UDim2.new(0.5, 0, 0.5, 0)}):Play()
 end)
 
--- // Premium Component Factory
-local function CreateZenithToggle(title, y, delay)
+-- // Elite Toggle Factory
+local function CreateToggle(name, yPos)
     local T = Instance.new("TextButton")
     T.Size = UDim2.new(0.9, 0, 0, 60)
-    T.Position = UDim2.new(1.5, 0, 0, y)
-    T.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
-    T.AutoButtonColor = false
+    T.Position = UDim2.new(0.5, 0, 0, yPos)
+    T.AnchorPoint = Vector2.new(0.5, 0)
+    T.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
     T.Text = ""
+    T.AutoButtonColor = false
     T.Parent = Main
     Instance.new("UICorner", T).CornerRadius = UDim.new(0, 12)
     
     local L = Instance.new("TextLabel")
     L.Size = UDim2.new(1, -70, 1, 0)
-    L.Position = UDim2.new(0, 20, 0, 0)
+    L.Position = UDim2.new(0, 15, 0, 0)
     L.BackgroundTransparency = 1
-    L.Text = title
+    L.Text = name
     L.Font = Enum.Font.GothamMedium
     L.TextColor3 = Color3.fromRGB(180, 180, 180)
-    L.TextSize = 15
+    L.TextSize = 14
     L.TextXAlignment = Enum.TextXAlignment.Left
     L.Parent = T
     
-    local Sw = Instance.new("Frame")
-    Sw.Size = UDim2.new(0, 40, 0, 20)
-    Sw.Position = UDim2.new(1, -60, 0.5, 0)
-    Sw.AnchorPoint = Vector2.new(0, 0.5)
-    Sw.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
-    Sw.Parent = T
-    Instance.new("UICorner", Sw).CornerRadius = UDim.new(1, 0)
+    local Switch = Instance.new("Frame")
+    Switch.Size = UDim2.new(0, 35, 0, 18)
+    Switch.Position = UDim2.new(1, -50, 0.5, 0)
+    Switch.AnchorPoint = Vector2.new(0, 0.5)
+    Switch.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+    Switch.Parent = T
+    Instance.new("UICorner", Switch).CornerRadius = UDim.new(1, 0)
     
-    local D = Instance.new("Frame")
-    D.Size = UDim2.new(0, 16, 0, 16)
-    D.Position = UDim2.new(0, 2, 0.5, 0)
-    D.AnchorPoint = Vector2.new(0, 0.5)
-    D.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    D.Parent = Sw
-    Instance.new("UICorner", D).CornerRadius = UDim.new(1, 0)
-    
-    -- Entry Stagger
-    task.delay(LOADING_TIME + 1 + delay, function()
-        TweenService:Create(T, TweenInfo.new(1, Enum.EasingStyle.BackOut), {Position = UDim2.new(0.05, 0, 0, y)}):Play()
-    end)
+    local Dot = Instance.new("Frame")
+    Dot.Size = UDim2.new(0, 14, 0, 14)
+    Dot.Position = UDim2.new(0, 2, 0.5, 0)
+    Dot.AnchorPoint = Vector2.new(0, 0.5)
+    Dot.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Dot.Parent = Switch
+    Instance.new("UICorner", Dot).CornerRadius = UDim.new(1, 0)
     
     local active = false
     T.MouseButton1Click:Connect(function()
         active = not active
-        TweenService:Create(Sw, TweenInfo.new(0.3), {BackgroundColor3 = active and PRIMARY or Color3.fromRGB(30, 30, 35)}):Play()
-        TweenService:Create(D, TweenInfo.new(0.4, Enum.EasingStyle.BackOut), {Position = active and UDim2.new(1, -18, 0.5, 0) or UDim2.new(0, 2, 0.5, 0)}):Play()
+        TweenService:Create(Switch, TweenInfo.new(0.3), {BackgroundColor3 = active and ACCENT or Color3.fromRGB(40, 40, 45)}):Play()
+        TweenService:Create(Dot, TweenInfo.new(0.3, Enum.EasingStyle.BackOut), {Position = active and UDim2.new(1, -16, 0.5, 0) or UDim2.new(0, 2, 0.5, 0)}):Play()
         TweenService:Create(L, TweenInfo.new(0.3), {TextColor3 = active and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(180, 180, 180)}):Play()
     end)
 end
 
--- // Populate UI
-CreateZenithToggle("Instant Auto-Trade", 80, 0.1)
-CreateZenithToggle("Bypass Anti-Cheat", 150, 0.2)
-CreateZenithToggle("Inventory Spoof", 220, 0.3)
-CreateZenithToggle("Network Optimizer", 290, 0.4)
+-- // Populate Dashboard
+CreateToggle("AUTO FRUIT ADDER", 80)
+CreateToggle("LEGENDARY SNIPER", 150)
+CreateToggle("BYPASS TRADE CAP", 220)
+CreateToggle("ANTI-BAN SHIELD", 290)
 
--- // Drag Logic (Universal)
-local drag, input, start, startPos
+-- // YouTube Click to Copy
+YT.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard(YT_LINK)
+        YT.Text = "LINK COPIED!"
+        task.wait(2)
+        YT.Text = "YouTube: AizenScript2"
+    end
+end)
+
+-- // Optimized Mobile Drag
+local drag, input, start, sPos
 Main.InputBegan:Connect(function(i)
     if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
-        drag = true; start = i.Position; startPos = Main.Position
+        drag = true; start = i.Position; sPos = Main.Position
         i.Changed:Connect(function() if i.UserInputState == Enum.UserInputState.End then drag = false end end)
     end
 end)
 UserInputService.InputChanged:Connect(function(i)
     if drag and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then
         local delta = i.Position - start
-        Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        Main.Position = UDim2.new(sPos.X.Scale, sPos.X.Offset + delta.X, sPos.Y.Scale, sPos.Y.Offset + delta.Y)
     end
 end)
